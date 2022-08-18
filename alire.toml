@@ -1,0 +1,22 @@
+name = "avrada_lib"
+description = "Library of drivers for AVR microcontrollers"
+version = "0.1.0-dev"
+
+authors = ["Rolf Ebert"]
+maintainers = ["Rolf Ebert <rolf.ebert.gcc@gmx.de>"]
+maintainers-logins = ["RREE"]
+licenses = "GPL-3.0-or-later WITH GCC-exception-3.1"
+website = "https://sourceforge.net/projects/avr-ada/"
+
+[configuration.values]
+avrada_rts.AVR_MCU  = "atmega328p"
+avrada_rts.Clock_Frequency  = 16_000_000
+
+[[depends-on]]
+gnat_avr_elf = "^11"
+avrada_rts = "*"
+avrada_mcu = "*"
+
+[[pins]]
+avrada_rts = { path = "../AVRAda_RTS" }
+avrada_mcu = { path = "../AVRAda_MCU" }

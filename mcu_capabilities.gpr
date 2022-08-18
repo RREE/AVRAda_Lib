@@ -1,0 +1,57 @@
+with "config/avrada_rts_config.gpr";
+
+abstract project MCU_Capabilities is
+   
+   MCU := AVRAda_RTS_Config.AVR_MCU;
+   
+   --
+   --  EEprom size
+   --
+   type Eeprom_Width_T is ("eeprom_8bit", "eeprom_16bit");
+   Eeprom_Width : Eeprom_Width_T := "eeprom_16bit";
+
+   case MCU is
+   when "at90s2313"  | "at90s2323"  | "at90s2343"  | "at90s4414"  | "at90s4433"
+      | "at90s4434"  | "atmega48"   | "attiny13"   | "attiny13a"  | "attiny22"
+      | "attiny2313" | "attiny26"   | "attiny4313"
+     => Eeprom_Width := "eeprom_8bit";
+   when others
+     => Eeprom_Width := "eeprom_16bit";
+   end case;
+
+
+   --
+   --  the name of the EEPROM "write enable" bit is PE on some devices
+   --  (otherwise it is WE)
+   --
+   type Eeprom_WE_T is ("eeprom_pe", "eeprom_we");
+   Eeprom_WE : Eeprom_WE_T := "eeprom_we";
+
+   case MCU is
+   when "atmega168"  | "atmega328p" | "atmega644"  | "atmega644p"
+      | "atmega2560" | "attiny2313" | "attiny4313" | "at90usb1286"
+      | "atmega32u4" | "attiny85"
+     => Eeprom_WE := "eeprom_pe";
+   when others
+     => Eeprom_WE := "eeprom_we";
+   end case;
+
+
+   --
+   --  Serial Interface
+   --
+   type UART_T is ("uart", "usart", "usart0", "usart1");
+   UART : UART_T := "usart0";
+
+   case MCU is
+   when "at90s2313"  | "at90s8515"
+     => UART := "uart";
+   when "atmega8"    | "atmega32" | "attiny2313" | "attiny4313"
+     => UART := "usart";
+   when "atmega8u2" | "at90usb1286" | "atmega32u4"
+     => UART := "usart1";
+   when others
+     => UART := "usart0";
+   end case;
+   
+end MCU_Capabilities;

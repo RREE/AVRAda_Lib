@@ -1,0 +1,330 @@
+---------------------------------------------------------------------------
+-- The AVR-Ada Library is free software;  you can redistribute it and/or --
+-- modify it under terms of the  GNU General Public License as published --
+-- by  the  Free Software  Foundation;  either  version 2, or  (at  your --
+-- option) any later version.  The AVR-Ada Library is distributed in the --
+-- hope that it will be useful, but  WITHOUT ANY WARRANTY;  without even --
+-- the  implied warranty of MERCHANTABILITY or FITNESS FOR A  PARTICULAR --
+-- PURPOSE. See the GNU General Public License for more details.         --
+---------------------------------------------------------------------------
+
+with "avrada_rts.gpr";
+with "avr_tool_options.gpr";
+with "config/avrada_rts_config.gpr";
+with "avrada_mcu.gpr";
+with "mcu_capabilities.gpr";
+
+project AVRAda_Lib is
+
+
+   for Library_Name use "avrada";
+   for Library_Kind use "static";
+   for Library_Dir use "lib";
+
+   for Object_Dir use "obj/" & AVRAda_RTS_Config.Build_Profile;
+   for Create_Missing_Dirs use "True";
+   
+   for Languages use ("Ada");
+   for Target use "avr";
+   for Runtime ("Ada") use AVRAda_RTS'Project_Dir;
+
+   for Source_Dirs use ("src");
+   
+   package Compiler is
+      for Default_Switches ("Ada") use AVR_Tool_Options.All_Adaflags;
+      
+      --  UART capabilities for preprocessor
+      for Switches ("avr-uart.adb") use Compiler'Default_Switches ("Ada")
+        & ("-gnateDUART=" & MCU_Capabilities.UART);
+      for Switches ("avr-uart_base_polled.adb") use Compiler'Default_Switches ("Ada")
+        & ("-gnateDUART=" & MCU_Capabilities.UART);
+      for Switches ("avr-uart_config.ads") use Compiler'Default_Switches ("Ada")
+        & ("-gnateDUART=" & MCU_Capabilities.UART);
+      for Switches ("avr-uart-lin.adb") use Compiler'Default_Switches ("Ada")
+        & ("-gnateDUART=" & MCU_Capabilities.UART);
+      
+      --  EEPROM capabilities for preprocessor
+      for Switches ("avr-eeprom.adb") use Compiler'Default_Switches ("Ada")
+        & ("-gnateDEEPROM_Width=" & MCU_Capabilities.EEPROM_Width,  
+           "-gnateDEEPROM_WE="    & MCU_Capabilities.EEPROM_WE
+          );
+   end Compiler;
+
+   -- package Builder renames AVR_Tools.Builder;
+   -- package Binder  renames AVR_Tools.Binder;
+   package Binder is
+      --  
+   end Binder;
+
+   package Install is
+      for Artifacts (".") use ("share");
+   end Install;
+   
+
+   MCU   := AVRAda_RTS_Config.AVR_MCU;
+
+   -- package Compiler is
+   --    for Default_Switches("Ada") use AVR_Tools.Compiler'Default_Switches("Ada");
+   --    for Switches ("avr-eeprom.adb") use Compiler'Default_Switches("Ada") &
+   --      ("-gnateDEeprom_Width=" & MCU.Eeprom_Width,
+   --       "-gnateDEeprom_We=" & MCU.Eeprom_WE);
+   -- end Compiler;
+
+   Std_Sources :=
+      (
+       --
+       -- general purpose definitions and subprograms
+       --
+       --  "avr.ads",                      "avr.adb",
+       "avr-wait.ads",                 "avr-wait.adb",
+       "avr-interrupts.ads",           "avr-interrupts.adb",
+       "avr-programspace.ads",         "avr-programspace.adb",
+       --
+       -- adoptions from the standard Ada library
+       --
+       "avr-strings.ads",
+       -- "avr-strings-pstring.ads",      "avr-strings-pstring.adb",
+       "avr-strings-progmem.ads",      "avr-strings-progmem.adb",
+       "avr-strings-search.ads",       "avr-strings-search.adb",
+--       "avr-strings-maps.ads",         "avr-strings-maps.adb",
+--       "avr-strings-maps-constants.ads",
+       "avr-strings-edit.ads",                  "avr-strings-edit.adb",
+       "avr-strings-edit-generic_integers.ads", "avr-strings-edit-generic_integers.adb",
+       "avr-strings-edit-integers.ads",
+
+       "avr-containers8.ads",
+       "avr-containers8-generic_bounded_priority_queues.ads",
+       "avr-containers8-generic_bounded_priority_queues.adb",
+       --
+       --  conversion between integer <-> string
+       --
+       "avr-int_img.ads",              "avr-int_img.adb",
+       "avr-int_val.ads",              "avr-int_val.adb"
+      );
+
+
+   UART_Sources     := ("avr-uart_config.ads",
+                        "avr-uart.ads",         "avr-uart.adb");
+   Serial_Sources   := ("avr-uart_base_polled.ads", "avr-uart_base_polled.adb",
+                        "avr-uart_config.ads",
+                        "avr-generic_text_io.ads",  "avr-generic_text_io.adb",
+                        "avr-serial_polled.ads",
+                        "avr-serial.ads");
+
+   SPI_Sources      := ("avr-spi.ads",          "avr-spi.adb",
+                        "avr-spi-master.ads",   "avr-spi-master.adb",
+                        "avr-spi-slave.ads",    "avr-spi-slave.adb");
+
+   EEPROM_Sources   := ("avr-eeprom.ads",       "avr-eeprom.adb");
+
+   WDT_Sources      := ("avr-watchdog.ads",     "avr-watchdog.adb");
+
+   ADC_Sources      := ("avr-adc.ads",          "avr-adc.adb");
+
+   Ext_Int_Sources  := ("avr-ext_int.ads",      "avr-ext_int.adb");
+
+   Timer0_Sources   := ("avr-timer0.ads",       "avr-timer0.adb");
+   Timer1_Sources   := ("avr-timer1.ads",       "avr-timer1.adb");
+   Timer1_8bit_Sources  := ("avr-timer1_8bit.ads", "avr-timer1_8bit.adb");
+   Timer2_Sources   := ("avr-timer2.ads",       "avr-timer2.adb");
+
+   Sleep_Sources    := ("avr-sleep.ads",         "avr-sleep.adb");
+
+   Power_Sources    := ("avr-power.ads",         "avr-power.adb");
+
+   Threads_Sources  := ("avr-threads.ads",       "avr-threads.adb");
+
+   I2C_Sources      := ("avr-i2c.ads",           "avr-i2c.adb",
+                        "avr-i2c-master.ads",    "avr-i2c-master.adb");
+                        
+   USI_TWI_Sources  := ("avr-usi_twi.ads",
+                        "avr-usi_twi-master.ads",
+                        "avr-usi_twi-master.adb");
+                        
+   ----------------------------------------------------------------------------
+
+   type Clock_Type is
+     ("no_clock",     --  no clock available.  A poor man's implementation
+                      --  of the delay statement is provided with busy
+                      --  waits.
+      "millisec_8b",  --  Resolution is about 1ms (0.25, 0.5, 1.0, 2.0)
+                      --  derived form the MCU frequency.  Delays and
+                      --  duration calculation are possible.  Variables
+                      --  of type Time use 8 bytes.
+      "ext_1sec_6b"); --  An external 32MHz quartz provides the time base.
+                      --  Smallest unit is one second, no calculation, no
+                      --  delays.
+                      --  Variables of type Time use 6 bytes, 3 for the
+                      --  date part and 3 for the time part.
+
+   Clock : Clock_Type := "millisec_8b";
+   -- Clock : Clock_Type := "ext_1sec_6b";
+
+   Time_No_Clock_Sources :=
+                       ("avr-wait-delays.ads",
+                        "avr-wait-delays.adb");
+
+   Time_Std_Sources := ("avr-real_time-clock.ads",
+                        "avr-real_time-clock.adb",
+                        "avr-real_time-clock_impl.ads",
+                        "avr-real_time-delays.ads",
+                        "avr-real_time-delays.adb"
+                       );
+
+   Time_TE_Sources  := ("avr-real_time-timing_events.ads",
+                        "avr-real_time-timing_events.adb",
+                        "avr-real_time-timing_events-process.ads",
+                        "avr-real_time-timing_events-process.adb"
+                       );
+
+   Time_1s_Sources  :=  Time_Std_Sources &
+                       ("avr-real_time_1s.ads",
+                        "avr-real_time_1s.adb",
+                        "avr-real_time-clock_impl_1s.adb",
+                        "avr-real_time-mod_time.ads",
+                        "avr-real_time-mod_time_1s.adb",
+                        "avr-real_time-set_clock.ads",
+                        "avr-real_time-set_clock_1s.adb"
+                       ) & Time_TE_Sources;
+
+   Time_1ms_Sources := Time_Std_Sources &
+                       ("avr-real_time.ads",
+                        "avr-real_time.adb",
+                        "avr-real_time-clock_impl.adb"
+--                        "avr-config.ads"
+                       ) & Time_TE_Sources;
+                       
+   Time_1ms_T1_Sources := Time_Std_Sources &
+                       ("avr-real_time.ads",
+                        "avr-real_time.adb",
+                        "avr-real_time-clock_impl_t1_8bit.adb"
+                       ) & Time_TE_Sources;
+
+   Time_Sources     := ();
+
+   case Clock is
+      when "millisec_8b" =>
+      case MCU is
+         when "attiny85" | "attiny13" | "attiny13a" => 
+            Time_Sources := Time_1ms_T1_Sources;
+         when others =>
+            Time_Sources := Time_1ms_Sources;
+      end case;      
+      when "ext_1sec_6b" =>
+         Time_Sources := Time_1s_Sources;
+      when "no_clock" =>
+         Time_Sources := Time_No_Clock_Sources;
+   end case;
+
+   ----------------------------------------------------------------------------
+
+   case MCU is
+      when "at90s2313" | "at90s8515" =>
+         for Source_Files use Std_Sources & UART_Sources & EEPROM_Sources
+                              & Time_Sources;
+
+      when "atmega32" =>
+         for Source_Files use
+           Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources
+           & ADC_Sources & Timer0_Sources & Timer1_Sources
+           & Time_1ms_Sources;
+
+      when   "atmega168" | "atmega328p" | "atmega644" | "atmega644p"
+           | "atmega2560" =>
+         for Source_Files use
+           Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources
+           & ADC_Sources & Timer0_Sources & Timer1_Sources & Timer2_Sources
+           & Time_Sources & Threads_Sources & SPI_Sources & Ext_Int_Sources
+           & WDT_Sources & Serial_Sources & I2C_Sources;
+
+      when "atmega8" | "atmega162" =>
+         for Source_Files use
+           Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources
+           & WDT_Sources & Time_No_Clock_Sources & Timer0_Sources;
+
+      when "atmega169" =>
+         for Source_Files use
+           Std_Sources & UART_Sources & EEPROM_Sources & WDT_Sources & SPI_Sources
+           & Time_Sources & Sleep_Sources & Timer0_Sources & Timer2_Sources;
+           --  & Power_Sources;
+
+      when   "attiny13" | "attiny13a" =>
+         for Source_Files use
+           Std_Sources & EEPROM_Sources & WDT_Sources
+           & Timer0_Sources & Time_No_Clock_Sources;
+
+      when   "atmega165"  | "atmega64"  | "atmega128"
+           | "at90can128" | "at90can32" | "at90can64"  | "atmega325"
+           | "atmega3250" | "atmega329" | "atmega3290" | "atmega645"
+           | "atmega6450" | "atmega649" | "atmega6490" | "atmega8515"
+           | "atmega8535" | "attiny26"  =>
+         for Source_Files use
+           Std_Sources & EEPROM_Sources & WDT_Sources & Time_Sources;
+
+      when "attiny2313" | "attiny4313" =>
+         for Source_Files use
+           Std_Sources & UART_Sources & EEPROM_Sources & WDT_Sources
+           & Timer0_Sources & Timer1_Sources & Time_Sources & Sleep_Sources
+           & USI_TWI_Sources;
+
+      when "attiny25" | "attiny45" =>
+         for Source_Files use
+           Std_Sources & Wdt_Sources & Ext_Int_Sources;
+
+      when "attiny85" =>
+         for Source_Files use
+           Std_Sources & EEPROM_Sources & Timer0_Sources & Timer1_8bit_Sources 
+           & Time_Sources & Sleep_Sources & Usi_TWI_Sources & Ext_Int_Sources;
+
+      when "atmega16" | "atmega161" | "atmega163" =>
+         for Source_Files use
+           Std_Sources & EEPROM_Sources;
+
+      when "atmega8u2" =>
+         for Source_Files use
+           Std_Sources & Timer0_Sources & Timer1_Sources & Time_Sources &
+           Serial_Sources & Sleep_Sources & UART_Sources;
+
+      when "at90usb1286" =>
+         for Source_Files use
+           Std_Sources & Timer0_Sources & Timer1_Sources &
+           Serial_Sources & UART_Sources & EEPROM_Sources;
+
+      when "atmega32u4" =>
+         for Source_Files use
+           Std_Sources & Timer0_Sources & Timer1_Sources &
+           Time_Sources & Sleep_Sources &
+           Serial_Sources & UART_Sources & EEPROM_Sources;
+
+      when others =>
+         for Source_Files use Std_Sources;
+   end case;
+
+
+   package Naming is
+   case MCU is
+      when "atmega169" =>
+      case Clock is
+         when "ext_1sec_6b" =>
+            for Spec ("AVR.Real_Time")            use "avr-real_time_1s.ads";
+            for Body ("AVR.Real_Time")            use "avr-real_time_1s.adb";
+            for Body ("AVR.Real_Time.Clock_Impl") use "avr-real_time-clock_impl_1s.adb";
+            for Body ("AVR.Real_Time.Mod_Time")   use "avr-real_time-mod_time_1s.adb";
+            for Body ("AVR.Real_Time.Set_Clock")  use "avr-real_time-set_clock_1s.adb";
+         when "millisec_8b" =>
+         when "no_clock" =>
+      end case; -- Clock
+      
+      when "attiny85" =>
+      --    for Spec ("AVR.Timer1") use "avr-timer1_8bit.ads";
+      --    for Body ("AVR.Timer1") use "avr-timer1_8bit.adb";
+      case Clock is
+         when "millisec_8b" =>
+            for Body ("AVR.Real_Time.Clock_Impl") use "avr-real_time-clock_impl_t1_8bit.adb";
+         when others =>
+      end case;
+      when others =>
+   end case;
+   end Naming;
+
+end AVRAda_Lib;

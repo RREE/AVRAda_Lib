@@ -1,0 +1,8 @@
+/obj/
+/lib/
+/alire/
+/config/
+*.o
+*.a
+*.ali
+*~
