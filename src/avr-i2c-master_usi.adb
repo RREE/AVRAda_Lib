@@ -24,7 +24,7 @@
 
 with Interfaces;                   use Interfaces;
 with AVR;                          use AVR;
-with AVR.Config;                   use AVR.Config;
+with AVRAda_RTS_Config;
 with AVR.Wait;
 with AVR.MCU;
 
@@ -67,10 +67,10 @@ package body AVR.I2C.Master is
 
 
    procedure T2_Wait is new AVR.Wait.Generic_Wait_USecs
-     (Crystal_Hertz => Clock_Frequency,
+     (Crystal_Hertz => AVRAda_RTS_Config.Clock_Frequency,
       Micro_Seconds => 5);
    procedure T4_Wait is new AVR.Wait.Generic_Wait_USecs
-     (Crystal_Hertz => AVR.Config.Clock_Frequency,
+     (Crystal_Hertz => AVRAda_RTS_Config.Clock_Frequency,
       Micro_Seconds => 4);
 
 

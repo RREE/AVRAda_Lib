@@ -26,7 +26,7 @@
 
 with Interfaces;                   use Interfaces;
 with AVR;                          use AVR;
-with AVR.Config;                   use AVR.Config;
+with AVRAda_RTS_Config;
 with AVR.Strings;                  use AVR.Strings;
 with AVR.Interrupts;
 with AVR.MCU;
@@ -114,7 +114,7 @@ package body AVR.I2C.Master is
       -- Interfaces.Unsigned_8 (((CPU_Speed / TWI_FREQ) - 16) / 2);
       -- (((16_000_000 / 100_000 = 160) - 16 = 144) / 2 = 72)
       -- (((16_000_000 / 400_000 = 40) - 16 = 24) / 2 = 12)
-      pragma Assert (AVR.Config.Clock_Frequency = 16_000_000);
+      pragma Assert (AVRAda_RTS_Config.Clock_Frequency = 16_000_000);
       if Speed = Fast then
          TWBR := 12;
       else

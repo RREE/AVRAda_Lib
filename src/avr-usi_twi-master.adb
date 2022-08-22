@@ -1,7 +1,7 @@
 --
 -- USI I2C package for AVR-Ada
 --
--- Copyright (C) 2013  Tero Koskinen <tero.koskinen@iki.fi>
+-- Copyright (C) 2013, 2022  Tero Koskinen <tero.koskinen@iki.fi>
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -30,14 +30,14 @@
 
 with AVR.MCU;
 with AVR.Wait;
-with AVR.Config;
+with AVRAda_RTS_Config;
 
 package body AVR.USI_TWI.Master is
    procedure T2_Wait is
-       new AVR.Wait.Generic_Wait_USecs (Crystal_Hertz => AVR.Config.Clock_Frequency,
+       new AVR.Wait.Generic_Wait_USecs (Crystal_Hertz => AVRAda_RTS_Config.Clock_Frequency,
                                         Micro_Seconds => 5);
    procedure T4_Wait is
-       new AVR.Wait.Generic_Wait_USecs (Crystal_Hertz => AVR.Config.Clock_Frequency,
+       new AVR.Wait.Generic_Wait_USecs (Crystal_Hertz => AVRAda_RTS_Config.Clock_Frequency,
                                         Micro_Seconds => 4);
    Error_State : TWI_Error_State;
    TW_READ : constant := 1;

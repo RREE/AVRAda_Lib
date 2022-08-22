@@ -19,7 +19,7 @@
 
 --  the current implementation is only tested on the ATmega169
 
-with AVR.Config;
+with AVRAda_Rts_Config;
 with AVR.Interrupts;
 with AVR.Timer1_8bit;
 
@@ -70,32 +70,32 @@ package body AVR.Real_Time.Clock_Impl is
       --  | 16 | 0.000_000_062_5 |   64 | 0.000_004 | 250 | 0.001_000 |
       --  +----------------------+------------------+-----------------+
 
-      if AVR.Config.Clock_Frequency = 1_000_000 then
+      if AVRAda_RTS_Config.Clock_Frequency = 1_000_000 then
          Timer.Init_CTC (Timer.Scale_By_8, Overflow => 124);
          pragma Compile_Time_Warning
            (True, "t0 scale: 8, overflow 124");
 
-      elsif AVR.Config.Clock_Frequency = 2_000_000 then
+      elsif AVRAda_RTS_Config.Clock_Frequency = 2_000_000 then
          Timer.Init_CTC (Timer.Scale_By_8, Overflow => 249);
          pragma Compile_Time_Warning
            (True, "t0 scale: 8, overflow 249");
 
-      elsif AVR.Config.Clock_Frequency = 4_000_000 then
+      elsif AVRAda_RTS_Config.Clock_Frequency = 4_000_000 then
          Timer.Init_CTC (Timer.Scale_By_64, Overflow => 62);
          pragma Compile_Time_Warning
            (True, "t0 scale: 64, overflow 62");
 
-      elsif AVR.Config.Clock_Frequency = 8_000_000 then
+      elsif AVRAda_RTS_Config.Clock_Frequency = 8_000_000 then
          Timer.Init_CTC (Timer.Scale_By_64, Overflow => 124);
          pragma Compile_Time_Warning
            (True, "t0 scale: 64, overflow 124");
 
-      elsif AVR.Config.Clock_Frequency = 12_000_000 then
+      elsif AVRAda_RTS_Config.Clock_Frequency = 12_000_000 then
          Timer.Init_CTC (Timer.Scale_By_64, Overflow => 187);
          pragma Compile_Time_Warning
            (True, "t0 scale: 64, overflow 187");
 
-      elsif AVR.Config.Clock_Frequency = 16_000_000 then
+      elsif AVRAda_RTS_Config.Clock_Frequency = 16_000_000 then
          Timer.Init_CTC (Timer.Scale_By_64, Overflow => 249);
          pragma Compile_Time_Warning
            (True, "t0 scale: 64, overflow 249");
