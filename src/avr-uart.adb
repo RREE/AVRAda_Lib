@@ -15,6 +15,7 @@
 -- executable file might be covered by the GNU Public License.           --
 ---------------------------------------------------------------------------
 
+with AVRAda_Lib_Config;                 use AVRAda_Lib_Config;
 with Ada.Unchecked_Conversion;
 with System;                            use type System.Address;
 with AVR.Int_Img;
@@ -24,27 +25,9 @@ with AVR.UART_Config;                   use AVR.UART_Config;
 
 package body AVR.UART is
 
-
-   ------------------------------------------------------------------------
-   --
-   type Receive_Mode_T is (Polled, Interrupt);
-   Receive_Mode : constant Receive_Mode_T := Polled;
-
-
    --
    --  Init
    --
-
-   --  procedure Init (Baud : Baud_Rate := 19200)
-   --  is
-   --     subtype B is Baud_Rate'Base;
-   --     Ubrr : constant Unsigned_16 := Unsigned_16
-   --       ((Config.Clock_Frequency + 8 * B (Baud)) /
-   --          ((16 * B (Baud)) - 1));
-   --  begin
-   --     Init (Ubrr, False);
-   --  end Init;
-
    procedure Init_Common (Baud_Divider : Serial_Speed;
                           Double_Speed : Boolean := False)
    is
@@ -83,15 +66,18 @@ package body AVR.UART is
                    Double_Speed : Boolean := False)
    is
    begin
+
       Init_Common (Baud_Divider, Double_Speed);
 
-      -- Enable receiver and transmitter
-      UCSRB := +(RXEN_Bit => True,
-                 TXEN_Bit => True,
-                 others => False);
+      if AVRAda_Lib_Config.UART_Receive_Mode = Polled then
 
-      -- Receive_Mode := Polled;
-      pragma Assert (Receive_Mode = Polled);
+         -- Enable receiver and transmitter
+         UCSRB := +(RXEN_Bit => True,
+                    TXEN_Bit => True,
+                    others => False);
+      else
+         null;
+      end if;
 
    end Init;
 
@@ -108,24 +94,23 @@ package body AVR.UART is
    begin
       Init_Common (Baud_Divider, Double_Speed);
 
-      -- Enable receiver and transmitter
-      UCSRB := +(RXEN_Bit => True,
-                 TXEN_Bit => True,
-                 RXCIE_Bit => True,     -- Enable Receiver interrupts
-                 others => False);
+      if AVRAda_Lib_Config.UART_Receive_Mode = Interrupt then
+         -- Enable receiver and transmitter
+         UCSRB := +(RXEN_Bit => True,
+                    TXEN_Bit => True,
+                    RXCIE_Bit => True,     -- Enable Receiver interrupts
+                    others => False);
 
-      -- Clear UART input queue
-      while UCSRA_Bits(RXC_Bit) = True loop
-         Data := UDR;     -- Empty data buffer
-      end loop;
-      Rx_Buf := Receive_Buffer;
-      Rx_Inx := Rx_Buf.all'First;
-      Rx_Outx := Rx_Buf.all'First;
+         -- Clear UART input queue
+         while UCSRA_Bits(RXC_Bit) = True loop
+            Data := UDR;     -- Empty data buffer
+         end loop;
+         Rx_Buf := Receive_Buffer;
+         Rx_Inx := Rx_Buf.all'First;
+         Rx_Outx := Rx_Buf.all'First;
 
-      Interrupts.Enable_Interrupts;
-
-      -- Receive_Mode := Interrupt;
-      pragma Assert (Receive_Mode = Interrupt);
+         Interrupts.Enable_Interrupts;
+      end if;
    end Init_Interrupt_Read;
 
 
@@ -191,14 +176,6 @@ package body AVR.UART is
    end Put;
 
 
---     procedure Put (S : Pstr20.Pstring) is
---     begin
---        for I in Unsigned_8'(1) .. Length(S) loop
---           Put (Element (S, I));
---        end loop;
---     end Put;
-
-
    procedure Put (Str : Program_Address; Len : Unsigned_8)
    is
       C : Unsigned_8;
@@ -211,6 +188,10 @@ package body AVR.UART is
          Text_Ptr := Text_Ptr + 1;
       end loop;
    end Put;
+
+
+   procedure Put_Inst is new Strings.Progmem.Generic_Put (Put);
+   procedure Put (S : PM_String) renames Put_Inst;
 
 
    --  pointer calculation for putting C like zero ended strings
@@ -361,8 +342,6 @@ package body AVR.UART is
 
    procedure Receiver_ISR is
    begin
-      pragma Assert (Receive_Mode = Interrupt);
-
       while UCSRA_Bits (RXC_Bit) = True loop
          Rx_Buf (Rx_Inx) := UDR;
          if Rx_Inx = Rx_Buf.all'Last then
@@ -384,7 +363,7 @@ package body AVR.UART is
 
    function Get_Raw return Unsigned_8 is
    begin
-      if Receive_Mode = Polled then
+      if AVRAda_Lib_Config.UART_Receive_Mode = Polled then
          while UCSRA_Bits (RXC_Bit) = False loop null; end loop;
          return UDR;
          --     0:   80 91 c0 00     lds     r24, 0x00C0

@@ -10,7 +10,7 @@ package AVR.Strings.Progmem is
 
 
    type Progmem_String is new AVR_String
-     with Linker_Section => ".progmem";
+     with Linker_Section => ".progmem.data";
    --  gcc-4.5.1: "pragma "LINKER_SECTION" applies only to objects"
    --  AdaCore implemented Linker_Section for types in gcc-4.9 on
    --  request of AVR-Ada [J121-006 public].
@@ -19,7 +19,7 @@ package AVR.Strings.Progmem is
    type Text_In_Progmem (Len : Nat8) is record
       Text : AVR_String(1..Len);
    end record
-     with Linker_Section => ".progmem";
+     with Linker_Section => ".progmem.data";
 
 
    --  a handle to the string in program memory (=flash)

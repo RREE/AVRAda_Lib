@@ -28,7 +28,7 @@ project AVRAda_Lib is
    for Target use "avr";
    for Runtime ("Ada") use AVRAda_RTS'Project_Dir;
 
-   for Source_Dirs use ("src");
+   for Source_Dirs use ("src", "config");
    
    package Compiler is
       for Default_Switches ("Ada") use AVR_Tool_Options.All_Adaflags;
@@ -50,12 +50,6 @@ project AVRAda_Lib is
           );
    end Compiler;
 
-   -- package Builder renames AVR_Tools.Builder;
-   -- package Binder  renames AVR_Tools.Binder;
-   package Binder is
-      --  
-   end Binder;
-
    package Install is
       for Artifacts (".") use ("share");
    end Install;
@@ -63,18 +57,12 @@ project AVRAda_Lib is
 
    MCU   := AVRAda_RTS_Config.AVR_MCU;
 
-   -- package Compiler is
-   --    for Default_Switches("Ada") use AVR_Tools.Compiler'Default_Switches("Ada");
-   --    for Switches ("avr-eeprom.adb") use Compiler'Default_Switches("Ada") &
-   --      ("-gnateDEeprom_Width=" & MCU.Eeprom_Width,
-   --       "-gnateDEeprom_We=" & MCU.Eeprom_WE);
-   -- end Compiler;
-
    Std_Sources :=
       (
        --
        -- general purpose definitions and subprograms
        --
+       "avrada_lib_config.ads",
        --  "avr.ads",                      "avr.adb",
        "avr-wait.ads",                 "avr-wait.adb",
        "avr-interrupts.ads",           "avr-interrupts.adb",
@@ -83,11 +71,8 @@ project AVRAda_Lib is
        -- adoptions from the standard Ada library
        --
        "avr-strings.ads",
-       -- "avr-strings-pstring.ads",      "avr-strings-pstring.adb",
        "avr-strings-progmem.ads",      "avr-strings-progmem.adb",
        "avr-strings-search.ads",       "avr-strings-search.adb",
---       "avr-strings-maps.ads",         "avr-strings-maps.adb",
---       "avr-strings-maps-constants.ads",
        "avr-strings-edit.ads",                  "avr-strings-edit.adb",
        "avr-strings-edit-generic_integers.ads", "avr-strings-edit-generic_integers.adb",
        "avr-strings-edit-integers.ads",
@@ -191,7 +176,6 @@ project AVRAda_Lib is
                        ("avr-real_time.ads",
                         "avr-real_time.adb",
                         "avr-real_time-clock_impl.adb"
---                        "avr-config.ads"
                        ) & Time_TE_Sources;
                        
    Time_1ms_T1_Sources := Time_Std_Sources &
@@ -220,8 +204,8 @@ project AVRAda_Lib is
 
    case MCU is
       when "at90s2313" | "at90s8515" =>
-         for Source_Files use Std_Sources & UART_Sources & EEPROM_Sources
-                              & Time_Sources;
+         for Source_Files use 
+           Std_Sources & UART_Sources & EEPROM_Sources & Time_Sources;
 
       when "atmega32" =>
          for Source_Files use
@@ -234,8 +218,9 @@ project AVRAda_Lib is
          for Source_Files use
            Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources
            & ADC_Sources & Timer0_Sources & Timer1_Sources & Timer2_Sources
-           & Time_Sources & Threads_Sources & SPI_Sources & Ext_Int_Sources
+           & Time_Sources & SPI_Sources & Ext_Int_Sources
            & WDT_Sources & Serial_Sources & I2C_Sources;
+      --  Threads_Sources
 
       when "atmega8" | "atmega162" =>
          for Source_Files use

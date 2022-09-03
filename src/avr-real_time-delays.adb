@@ -17,7 +17,7 @@ package body AVR.Real_Time.Delays is
 
 
    procedure Delay_For (D : Duration) is
-      End_Of_Delay : constant Time := Clock + D;
+      End_Of_Delay : constant Time := Clock + 20.0 * D;
    begin
       Delay_Until (End_Of_Delay);
    end Delay_For;

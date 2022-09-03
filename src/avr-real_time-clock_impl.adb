@@ -20,6 +20,7 @@
 --  the current implementation is only tested on the ATmega169
 
 with AVRAda_RTS_Config;
+with AVRAda_Lib_Config;
 with AVR.Interrupts;
 with AVR.Timer0;
 with AVR.Real_Time.Timing_Events.Process;
@@ -30,9 +31,6 @@ package body AVR.Real_Time.Clock_Impl is
 
    --  one millisecond
    Tick_Delta : constant := 0.001;
-
-   --  do we want to process timing events at every timer tick?
-   Process_Timing_Events : constant Boolean := True;
 
    -------------------------------------------------------------------------
 
@@ -51,7 +49,8 @@ package body AVR.Real_Time.Clock_Impl is
          Local_Secs := 0.0;
       end if;
       Now.Secs := Local_Secs;
-      if Process_Timing_Events then
+      --  do we want to process timing events at every timer tick?
+      if AVRAda_Lib_Config.Process_Timing_Events_In_Ticks then
          AVR.Real_Time.Timing_Events.Process;
       end if;
    end Tick;
@@ -78,33 +77,33 @@ package body AVR.Real_Time.Clock_Impl is
 
       if AVRAda_RTS_Config.Clock_Frequency = 1_000_000 then
          Timer0.Init_CTC (Timer0.Scale_By_8, Overflow => 124);
-         pragma Compile_Time_Warning
-           (True, "t0 scale: 8, overflow 124");
+         --  pragma Compile_Time_Warning
+         --    (True, "t0 scale: 8, overflow 124");
 
       elsif AVRAda_RTS_Config.Clock_Frequency = 2_000_000 then
          Timer0.Init_CTC (Timer0.Scale_By_8, Overflow => 249);
-         pragma Compile_Time_Warning
-           (True, "t0 scale: 8, overflow 249");
+         --  pragma Compile_Time_Warning
+         --    (True, "t0 scale: 8, overflow 249");
 
       elsif AVRAda_RTS_Config.Clock_Frequency = 4_000_000 then
          Timer0.Init_CTC (Timer0.Scale_By_64, Overflow => 62);
-         pragma Compile_Time_Warning
-           (True, "t0 scale: 64, overflow 62");
+         --  pragma Compile_Time_Warning
+         --    (True, "t0 scale: 64, overflow 62");
 
       elsif AVRAda_RTS_Config.Clock_Frequency = 8_000_000 then
          Timer0.Init_CTC (Timer0.Scale_By_64, Overflow => 124);
-         pragma Compile_Time_Warning
-           (True, "t0 scale: 64, overflow 124");
+         --  pragma Compile_Time_Warning
+         --    (True, "t0 scale: 64, overflow 124");
 
       elsif AVRAda_RTS_Config.Clock_Frequency = 12_000_000 then
          Timer0.Init_CTC (Timer0.Scale_By_64, Overflow => 187);
-         pragma Compile_Time_Warning
-           (True, "t0 scale: 64, overflow 187");
+         --  pragma Compile_Time_Warning
+         --    (True, "t0 scale: 64, overflow 187");
 
       elsif AVRAda_RTS_Config.Clock_Frequency = 16_000_000 then
          Timer0.Init_CTC (Timer0.Scale_By_64, Overflow => 249);
-         pragma Compile_Time_Warning
-           (True, "t0 scale: 64, overflow 249");
+         --  pragma Compile_Time_Warning
+         --    (True, "t0 scale: 64, overflow 249");
 
       else
          pragma Compile_Time_Warning

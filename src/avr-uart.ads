@@ -25,6 +25,7 @@
 
 
 with AVR.Strings;                  use AVR.Strings;
+with AVR.Strings.Progmem;          use AVR.Strings.Progmem;
 with AVR.Programspace;             use AVR.Programspace;
 
 package AVR.UART is
@@ -85,8 +86,8 @@ package AVR.UART is
    procedure Put_Raw (Data : Unsigned_8);
 
    procedure Put (S : AVR_String);
-   --  procedure Put (S : Pstr20.Pstring);
    procedure Put (Str : Program_Address; Len : Unsigned_8);
+   procedure Put (S : PM_String);
    procedure Put_C (S : Chars_Ptr);
    procedure Put (S : Chars_Ptr) renames Put_C;
 
