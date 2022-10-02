@@ -21,7 +21,7 @@ Process_Timing_Events_In_Ticks = {type = "Boolean", default = false}
 UART_Receive_Mode = {type = "Enum", values = ["polled", "interrupt"], default = "polled"}
 
 [[depends-on]]
-gnat_avr_elf = "^11"
+gnat_avr_elf = "^11 | ^12.2"
 avrada_rts = "^2.0.0"
 avrada_mcu = "^2.0.0"
 
