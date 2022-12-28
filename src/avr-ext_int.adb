@@ -35,7 +35,7 @@ package body AVR.Ext_Int is
    -- external interrupts
    --
    procedure Set_Int0_Sense_Control (Trigger : Trigger_T) is
-#if MCU = "attiny85" then
+#if MCU = "attiny85" or else MCU = "atmega162" then
       Ctrl_Reg : Bits_In_Byte renames MCU.MCUCR_Bits;
 #else
       Ctrl_Reg : Bits_In_Byte renames MCU.EICRA_Bits;
@@ -58,8 +58,12 @@ package body AVR.Ext_Int is
    end Set_Int0_Sense_Control;
 
    procedure Set_Int1_Sense_Control (Trigger : Trigger_T) is
-#if not (MCU = "attiny85") then
+#if MCU = "atmega162" then
+      Ctrl_Reg : Bits_In_Byte renames MCU.MCUCR_Bits;
+#else
       Ctrl_Reg : Bits_In_Byte renames MCU.EICRA_Bits;
+#end if;
+#if not (MCU = "attiny85") then
    begin
       case Trigger is
          when Is_Low      =>
@@ -85,6 +89,8 @@ package body AVR.Ext_Int is
    begin
 #if MCU = "attiny85" then
       MCU.GIMSK_Bits (MCU.INT0_Bit) := True;
+#elsif MCU = "atmega162" then
+      MCU.GICR_Bits (MCU.INT0_Bit) := True;
 #else
       MCU.EIMSK_Bits (MCU.INT0_Bit) := True;
 #end if;
@@ -92,7 +98,9 @@ package body AVR.Ext_Int is
 
    procedure Enable_External_Interrupt_1 is
    begin
-#if not (MCU = "attiny85") then
+#if MCU = "atmega162" then
+      MCU.GICR_Bits (MCU.INT1_Bit) := True;
+#elsif not (MCU = "attiny85") then
       MCU.EIMSK_Bits (MCU.INT1_Bit) := True;
 #else
       null;
@@ -102,7 +110,9 @@ package body AVR.Ext_Int is
    procedure Disable_External_Interrupt_0 is
    begin
 #if MCU = "attiny85" then
-      MCU.GIMSK_Bits (MCU.INT0_Bit) := True;
+      MCU.GIMSK_Bits (MCU.INT0_Bit) := False;
+#elsif MCU = "atmega162" then
+      MCU.GICR_Bits (MCU.INT0_Bit) := False;
 #else
       MCU.EIMSK_Bits (MCU.INT0_Bit) := False;
 #end if;
@@ -110,7 +120,9 @@ package body AVR.Ext_Int is
 
    procedure Disable_External_Interrupt_1 is
    begin
-#if not (MCU = "attiny85") then
+#if MCU = "atmega162" then
+      MCU.GICR_Bits (MCU.INT1_Bit) := False;
+#elsif not (MCU = "attiny85") then
       MCU.EIMSK_Bits (MCU.INT1_Bit) := False;
 #else
       null;
@@ -141,15 +153,19 @@ package body AVR.Ext_Int is
       MCU.PCMSK1 := Mask;
    end Select_Pins_For_PCI1;
 
+#if not (MCU = "atmega162") then
    procedure Select_Pins_For_PCI2 (Mask : Unsigned_8) is
    begin
       MCU.PCMSK2 := Mask;
    end Select_Pins_For_PCI2;
 #end if;
+#end if;
 
    procedure Enable_Pin_Change_Interrupt_0 is
    begin
-#if MCU = "attiny85" then
+#if MCU = "atmega162" then
+      MCU.GIFR_Bits (MCU.PCIF0_Bit) := True;
+#elsif MCU = "attiny85" then
       MCU.GIMSK_Bits (MCU.PCIE_Bit) := True;
 #else
       MCU.PCICR_Bits (MCU.PCIE0_Bit) := True;
@@ -158,7 +174,9 @@ package body AVR.Ext_Int is
 
    procedure Enable_Pin_Change_Interrupt_1 is
    begin
-#if not (MCU = "attiny85") then
+#if MCU = "atmega162" then
+      MCU.GIFR_Bits (MCU.PCIF1_Bit) := True;
+#elsif not (MCU = "attiny85") then
       MCU.PCICR_Bits (MCU.PCIE1_Bit) := True;
 #else
       null;
@@ -167,7 +185,7 @@ package body AVR.Ext_Int is
 
    procedure Enable_Pin_Change_Interrupt_2 is
    begin
-#if not (MCU = "attiny85") then
+#if (not MCU = "attiny85") and (not MCU = "atmega162") then
       MCU.PCICR_Bits (MCU.PCIE2_Bit) := True;
 #else
       null;
@@ -176,7 +194,9 @@ package body AVR.Ext_Int is
 
    procedure Disable_Pin_Change_Interrupt_0 is
    begin
-#if MCU = "attiny85" then
+#if MCU = "atmega162" then
+      MCU.GIFR_Bits (MCU.PCIF0_Bit) := False;
+#elsif MCU = "attiny85" then
       MCU.GIMSK_Bits (MCU.PCIE_Bit) := False;
 #else
       MCU.PCICR_Bits (MCU.PCIE0_Bit) := False;
@@ -185,7 +205,9 @@ package body AVR.Ext_Int is
 
    procedure Disable_Pin_Change_Interrupt_1 is
    begin
-#if not (MCU = "attiny85") then
+#if MCU = "atmega162" then
+      MCU.GIFR_Bits (MCU.PCIF0_Bit) := False;
+#elsif not (MCU = "attiny85") then
       MCU.PCICR_Bits (MCU.PCIE1_Bit) := False;
 #else
       null;
@@ -194,7 +216,7 @@ package body AVR.Ext_Int is
 
    procedure Disable_Pin_Change_Interrupt_2 is
    begin
-#if not (MCU = "attiny85") then
+#if (not MCU = "attiny85") and (not MCU = "atmega162") then
       MCU.PCICR_Bits (MCU.PCIE2_Bit) := False;
 #else
       null;

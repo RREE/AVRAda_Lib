@@ -63,7 +63,7 @@ package AVR.Timer0 is
 #elsif MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "attiny85" or else MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" or else MCU = "atmega8u2" or else MCU = "at90usb1286" or else MCU = "atmega32u4" then
    Signal_Compare  : constant String := MCU.Sig_TIMER0_COMPA_String;
    Signal_Overflow : constant String := MCU.Sig_TIMER0_OVF_String;
-#elsif MCU = "atmega169" or else MCU = "atmega32" then
+#elsif MCU = "atmega169" or else MCU = "atmega32" or else MCU = "atmega162" then
    Signal_Compare  : constant String := MCU.Sig_TIMER0_COMP_String;
    Signal_Overflow : constant String := MCU.Sig_TIMER0_OVF_String;
 #elsif MCU = "atmega8" then

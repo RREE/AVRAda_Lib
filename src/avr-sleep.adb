@@ -15,15 +15,53 @@
 -- executable file might be covered by the GNU Public License.           --
 ---------------------------------------------------------------------------
 
-with AVR.MCU;
+with AVR.MCU;                      use AVR.MCU;
 with AVR.Interrupts;
 
 package body AVR.Sleep is
 
 
+   Sleep_Enable : Boolean renames
+#if MCU = "atmega8" or else MCU = "atmega32" or else MCU = "atmega162" or else MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "attiny85" then
+     MCUCR_Bits(SE_Bit);
+#else
+     SMCR_Bits(SE_Bit);
+#end if;
+
+
+   SM0 : Boolean renames
+#if MCU = "atmega8" or else MCU = "atmega32" or else MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "attiny85" then
+      MCUCR_Bits (SM0_Bit);
+#elsif MCU = "atmega162" then
+      EMCUCR_Bits (SM0_Bit);
+#else
+      SMCR_Bits (SMO_Bit);
+#end if;
+
+
+   SM1 : Boolean renames
+#if MCU = "atmega8" or else MCU = "atmega32" or else MCU = "atmega162" or else MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "attiny85" then
+      MCUCR_Bits (SM1_Bit);
+#else
+      SMCR_Bits (SM1_Bit);
+#end if;
+
+
+#if (not MCU = "attiny2313") and (not MCU = "attiny4313") and (not MCU = "attiny85") then
+   SM2 : Boolean renames
+#if MCU = "atmega8" or else MCU = "atmega32" then
+      MCUCR_Bits (SM2_Bit);
+#elsif MCU = "atmega162" then
+      MCUCSR_Bits (SM2_Bit);
+#else
+      SMCR_Bits (SM2_Bit);
+#end if;
+#end if;
+
+
    --  Define internal sleep types for the various devices.  Also define
    --  some internal masks for use in Set_Mode.
-#if MCU = "atmega8" or else MCU = "atmega32" or else MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "attiny85" then
+#if MCU = "atmega8" or else MCU = "atmega32" or else MCU = "atmega162" or else MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "attiny85" then
    Sleep_Ctrl_Bits : AVR.Bits_In_Byte renames AVR.MCU.MCUCR_Bits;
 #else
    Sleep_Ctrl_Bits : AVR.Bits_In_Byte renames AVR.MCU.SMCR_Bits;
@@ -59,88 +97,6 @@ package body AVR.Sleep is
    ---------------------------------------------------------------------------
 
 
---     -- Define the sleep modes according to the internal sleep types.
---  #if _SLEEP_TYPE == 1
---     #define SLEEP_MODE_IDLE         0
---       #define SLEEP_MODE_PWR_DOWN     _BV(SM)
---  #endif
-
-
---  #if _SLEEP_TYPE == 2
-
---  --
---  --   * Type 2 devices are not completely identical, so we need a few
---  --   * #ifdefs here.
---  --   *
---  --   * Note that it appears the datasheet of the tiny2313 has the bottom
---  --   * two lines of table 13 with the wrong SM0/SM1 values.
-
---  #define SLEEP_MODE_IDLE         0
-
---  #if !defined(__AVR_ATtiny2313__) && !defined(__AVR_AT94K__)
---  -- no ADC in ATtiny2313, SM0 is alternative powerdown mode
---  -- no ADC in AT94K, setting SM0 only is reserved
---  # define SLEEP_MODE_ADC          _BV(SM0)
---  #endif -- !defined(__AVR_ATtiny2313__) && !defined(__AVR_AT94K__)
-
---  #define SLEEP_MODE_PWR_DOWN     _BV(SM1)
-
---  #if defined(__AVR_ATtiny2313__) || defined(__AVR_ATtiny26__)
---  -- tiny2313 and tiny26 have standby rather than powersave */
---  # define SLEEP_MODE_STANDBY      (_BV(SM0) | _BV(SM1))
---  #elif !defined(__AVR_ATtiny13__)
---  -- SM0|SM1 is reserved on the tiny13 */
---  # define SLEEP_MODE_PWR_SAVE     (_BV(SM0) | _BV(SM1))
---  #endif
-
---  #endif
-
-
---  #if _SLEEP_TYPE == 3 || defined(__DOXYGEN__)
---  -- \ingroup avr_sleep
---  --      \def SLEEP_MODE_IDLE
---  --      Idle mode.
---  #define SLEEP_MODE_IDLE         0
---  --* \ingroup avr_sleep
---  --      \def SLEEP_MODE_ADC
---  --      ADC Noise Reduction Mode. */
---  #define SLEEP_MODE_ADC          _BV(SM0)
---  --* \ingroup avr_sleep
---  --      \def SLEEP_MODE_PWR_DOWN
---  --      Power Down Mode. */
---  #define SLEEP_MODE_PWR_DOWN     _BV(SM1)
---  --* \ingroup avr_sleep
---  --      \def SLEEP_MODE_PWR_SAVE
---  --      Power Save Mode. */
---  #define SLEEP_MODE_PWR_SAVE     (_BV(SM0) | _BV(SM1))
---  --* \ingroup avr_sleep
---  --      \def SLEEP_MODE_STANDBY
---  --      Standby Mode. */
---  #define SLEEP_MODE_STANDBY      (_BV(SM1) | _BV(SM2))
---  --* \ingroup avr_sleep
---  --      \def SLEEP_MODE_EXT_STANDBY
---  --      Extended Standby Mode. */
---  #define SLEEP_MODE_EXT_STANDBY  (_BV(SM0) | _BV(SM1) | _BV(SM2))
---  #endif
-
-
---  #if _SLEEP_TYPE == 4
---  #define SLEEP_MODE_IDLE         0
---  #define SLEEP_MODE_PWR_DOWN     1
---  #define SLEEP_MODE_PWR_SAVE     2
---  #define SLEEP_MODE_ADC          3
---  #define SLEEP_MODE_STANDBY      4
---  #define SLEEP_MODE_EXT_STANDBY  5
---  #endif
-
-
---  #if _SLEEP_TYPE == 5
---  #define SLEEP_MODE_IDLE         0
---  #define SLEEP_MODE_PWR_DOWN     1
---  #define SLEEP_MODE_PWR_SAVE     2
---  #endif
-
-
    procedure Sleep_Instr;
    pragma Inline_Always (Sleep_Instr);
    pragma Import (Intrinsic, Sleep_Instr, "__builtin_avr_sleep");
@@ -161,82 +117,68 @@ package body AVR.Sleep is
       --
       case Mode is
       when Idle =>
-         Sleep_Ctrl_Bits (SM0_Bit) := False;
-         Sleep_Ctrl_Bits (SM1_Bit) := False;
-#if (not MCU = "attiny2313") and (not MCU = "attiny4313") and ( not MCU = "attiny85" ) then
-         Sleep_Ctrl_Bits (SM2_Bit) := False;
+         --  Sleep_Ctrl_Bits (SM0_Bit) := False;
+         --  Sleep_Ctrl_Bits (SM1_Bit) := False;
+         SM0 := False;
+         SM1 := False;
+#if (not MCU = "attiny2313") and (not MCU = "attiny4313") and (not MCU = "attiny85") then
+         --  Sleep_Ctrl_Bits (SM2_Bit) := False;
+         SM2 := False;
 #end if;
 
       when ADC_Noise_Reduction =>
-         Sleep_Ctrl_Bits (SM0_Bit) := True;
-         Sleep_Ctrl_Bits (SM1_Bit) := False;
-#if ( not MCU = "attiny2313" ) and ( not MCU = "attiny4313" ) and ( not MCU = "attiny85" ) then
-         Sleep_Ctrl_Bits (SM2_Bit) := False;
+         --  Sleep_Ctrl_Bits (SM0_Bit) := True;
+         --  Sleep_Ctrl_Bits (SM1_Bit) := False;
+         SM0 := True;
+         SM1 := False;
+#if (not MCU = "attiny2313") and (not MCU = "attiny4313") and (not MCU = "attiny85") then
+         --  Sleep_Ctrl_Bits (SM2_Bit) := False;
+         SM2 := False;
 #end if;
 
       when Power_Down =>
-         Sleep_Ctrl_Bits (SM0_Bit) := False;
-         Sleep_Ctrl_Bits (SM1_Bit) := True;
-#if (not MCU = "attiny2313") and (not MCU = "attiny4313") and ( not MCU = "attiny85" ) then
-         Sleep_Ctrl_Bits (SM2_Bit) := False;
+         --  Sleep_Ctrl_Bits (SM0_Bit) := False;
+         --  Sleep_Ctrl_Bits (SM1_Bit) := True;
+         SM0 := False;
+         SM1 := True;
+#if (not MCU = "attiny2313") and (not MCU = "attiny4313") and (not MCU = "attiny85") then
+         --  Sleep_Ctrl_Bits (SM2_Bit) := False;
+         SM2 := False;
 #end if;
 
       when Power_Save =>
-         Sleep_Ctrl_Bits (SM0_Bit) := True;
-         Sleep_Ctrl_Bits (SM1_Bit) := True;
-#if (not MCU = "attiny2313" ) and (not MCU = "attiny4313" ) and ( not MCU = "attiny85" ) then
-         Sleep_Ctrl_Bits (SM2_Bit) := False;
-#else
-         raise Program_Error with "Power_Save not supported on this MCU";
+         --  Sleep_Ctrl_Bits (SM0_Bit) := True;
+         --  Sleep_Ctrl_Bits (SM1_Bit) := True;
+         SM0 := True;
+         SM1 := True;
+#if (not MCU = "attiny2313") and (not MCU = "attiny4313") and (not MCU = "attiny85") then
+         --  Sleep_Ctrl_Bits (SM2_Bit) := False;
+         SM2 := False;
 #end if;
 
       when Standby =>
-         Sleep_Ctrl_Bits (SM0_Bit) := False;
-         Sleep_Ctrl_Bits (SM1_Bit) := True;
-#if ( not MCU = "attiny2313" ) and ( not MCU = "attiny4313" ) and ( not MCU = "attiny85" ) then
-         Sleep_Ctrl_Bits (SM2_Bit) := True;
-#else
-         raise Program_Error with "Standby not supported on this MCU";
+         --  Sleep_Ctrl_Bits (SM0_Bit) := False;
+         --  Sleep_Ctrl_Bits (SM1_Bit) := True;
+         SM0 := False;
+         SM1 := True;
+#if (not MCU = "attiny2313") and (not MCU = "attiny4313") and (not MCU = "attiny85") then
+         --  Sleep_Ctrl_Bits (SM2_Bit) := True;
+         SM2 := True;
 #end if;
 
       when Extended_Standby =>
-         Sleep_Ctrl_Bits (SM0_Bit) := True;
-         Sleep_Ctrl_Bits (SM1_Bit) := True;
-#if ( not MCU = "attiny2313" ) and ( not MCU = "attiny4313" ) and ( not MCU = "attiny85" ) then
-         Sleep_Ctrl_Bits (SM2_Bit) := True;
-#else
-         raise Program_Error with "Extended_Standby not supported on this MCU";
+         --  Sleep_Ctrl_Bits (SM0_Bit) := True;
+         --  Sleep_Ctrl_Bits (SM1_Bit) := True;
+         SM0 := True;
+         SM1 := True;
+#if (not MCU = "attiny2313") and (not MCU = "attiny4313") and (not MCU = "attiny85") then
+         --  Sleep_Ctrl_Bits (SM2_Bit) := True;
+         SM2 := True;
 #end if;
       end case;
 
    end Set_Mode;
 
-
---  #elif _SLEEP_TYPE == 5
-
---  #define set_sleep_mode(mode) \
---  do { \
---      MCUCR = ((MCUCR & ~_BV(SM1)) | ((mode) == SLEEP_MODE_PWR_DOWN || (mode) == SLEEP_MODE_PWR_SAVE ? _BV(SM1) : 0));
---      EMCUCR = ((EMCUCR & ~_BV(SM0)) | ((mode) == SLEEP_MODE_PWR_SAVE ? _BV(SM0) : 0));
---  } while(0)
-
---  #elif _SLEEP_TYPE == 4
-
---  #define set_sleep_mode(mode) \
---  do { \
---      MCUCR = ((MCUCR & ~_BV(SM1)) | ((mode) == SLEEP_MODE_IDLE ? 0 : _BV(SM1))); \
---      MCUCSR = ((MCUCSR & ~_BV(SM2)) | ((mode) == SLEEP_MODE_STANDBY  || (mode) == SLEEP_MODE_EXT_STANDBY ? _BV(SM2) : 0)); \
---      EMCUCR = ((EMCUCR & ~_BV(SM0)) | ((mode) == SLEEP_MODE_PWR_SAVE || (mode) == SLEEP_MODE_EXT_STANDBY ? _BV(SM0) : 0)); \
---  } while(0)
-
---  #elif _SLEEP_TYPE == 3 || _SLEEP_TYPE == 2 || _SLEEP_TYPE == 1
-
---  #define set_sleep_mode(mode) \
---  do { \
---      _SLEEP_CONTROL_REG = ((_SLEEP_CONTROL_REG & ~_SLEEP_MODE_MASK) | (mode)); \
---  } while(0)
-
---  #endif
 
    --  Put the device in sleep mode. How the device is brought out of
    --  sleep mode depends on the specific mode selected with the
@@ -247,16 +189,16 @@ package body AVR.Sleep is
    --  Manipulates the SE (sleep enable) bit.
    procedure Enable is
    begin
-      Sleep_Ctrl_Bits (AVR.MCU.SE_Bit) := True;
+      Sleep_Enable := True;
    end Enable;
 
    procedure Disable is
    begin
-      Sleep_Ctrl_Bits (AVR.MCU.SE_Bit) := False;
+      Sleep_Enable := False;
    end Disable;
 
 
-   --  Put the device in sleep mode. SE-bit must be set beforehand.
+   --  Put the device in sleep mode.
    procedure Go_Sleeping is
    begin
       Enable;

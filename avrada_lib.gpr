@@ -222,10 +222,22 @@ project AVRAda_Lib is
            & WDT_Sources & Serial_Sources & I2C_Sources;
       --  Threads_Sources
 
-      when "atmega8" | "atmega162" =>
+      when   "atmega640" | "atmega1280" | "atmega1281" | "atmega2560"
+           | "atmega2561" =>
+         for Source_Files use
+           Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources;
+
+      when "atmega8" =>
          for Source_Files use
            Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources
            & WDT_Sources & Time_No_Clock_Sources & Timer0_Sources;
+
+      when "atmega162" =>
+         for Source_Files use
+           Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources
+           & Time_Std_Sources & Time_1ms_Sources & Timer0_Sources
+           & Timer1_Sources & Ext_Int_Sources;
+      --  no ADC on atmega162
 
       when "atmega169" =>
          for Source_Files use

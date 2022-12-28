@@ -56,7 +56,9 @@ package AVR.Ext_Int is
    procedure Select_Pins_For_PCI0 (Mask : Unsigned_8);
 #if not (MCU = "attiny85") then
    procedure Select_Pins_For_PCI1 (Mask : Unsigned_8);
+#if not (MCU = "atmega162") then
    procedure Select_Pins_For_PCI2 (Mask : Unsigned_8);
+#end if;
 #end if;
 
    procedure Enable_Pin_Change_Interrupt_0;
@@ -71,7 +73,9 @@ package AVR.Ext_Int is
    Signal_Pin_Change_Int0 : constant String := MCU.Sig_PCINT0_String;
 #if not (MCU = "attiny85") then
    Signal_Pin_Change_Int1 : constant String := MCU.Sig_PCINT1_String;
+#if not (MCU = "atmega162") then
    Signal_Pin_Change_Int2 : constant String := MCU.Sig_PCINT2_String;
+#end if;
 #end if;
 
 
@@ -91,10 +95,11 @@ private
    pragma Inline (Select_Pins_For_PCI1);
    pragma Inline (Enable_Pin_Change_Interrupt_1);
    pragma Inline (Disable_Pin_Change_Interrupt_1);
-
+#if not (MCU = "atmega162") then
    pragma Inline (Select_Pins_For_PCI2);
    pragma Inline (Enable_Pin_Change_Interrupt_2);
    pragma Inline (Disable_Pin_Change_Interrupt_2);
+#end if;
 #end if;
 
 end AVR.Ext_Int;
