@@ -32,10 +32,10 @@ package body AVR.Watchdog is
       new Ada.Unchecked_Conversion (WDT_Oscillator_Cycles, Unsigned_8);
 
 
-#if MCU = "attiny2313" or else MCU = "atmega169" or else MCU = "atmega8" then
+#if MCU = "attiny2313" or else MCU = "atmega169" or else MCU = "atmega8" or else MCU = "atmega162" then
    Watchdog_Control_R : Unsigned_8 renames WDTCR;
    Watchdog_Control_B : Bits_In_Byte renames WDTCR_Bits;
-#elsif MCU = "atmega168" or else MCU = "atmega2560" or else MCU = "atmega328p" or else MCU = "atmega644p" then
+#elsif MCU = "atmega168" or else MCU = "atmega2560" or else MCU = "atmega328p" or else MCU = "atmega644p" or else MCU = "atmega1280" then
    Watchdog_Control_R : Unsigned_8 renames WDTCSR;
    Watchdog_Control_B : Bits_In_Byte renames WDTCSR_Bits;
 #end if;

@@ -213,8 +213,7 @@ project AVRAda_Lib is
            & ADC_Sources & Timer0_Sources & Timer1_Sources
            & Time_1ms_Sources;
 
-      when   "atmega168" | "atmega328p" | "atmega644" | "atmega644p"
-           | "atmega2560" =>
+      when   "atmega168" | "atmega328p" | "atmega644" | "atmega644p" =>
          for Source_Files use
            Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources
            & ADC_Sources & Timer0_Sources & Timer1_Sources & Timer2_Sources
@@ -225,7 +224,10 @@ project AVRAda_Lib is
       when   "atmega640" | "atmega1280" | "atmega1281" | "atmega2560"
            | "atmega2561" =>
          for Source_Files use
-           Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources;
+           Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources
+           & ADC_Sources & Timer0_Sources & Timer1_Sources & Timer2_Sources
+           & SPI_Sources & Ext_Int_Sources & WDT_Sources & Serial_Sources 
+           & I2C_Sources;
 
       when "atmega8" =>
          for Source_Files use
@@ -236,7 +238,8 @@ project AVRAda_Lib is
          for Source_Files use
            Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources
            & Time_Std_Sources & Time_1ms_Sources & Timer0_Sources
-           & Timer1_Sources & Ext_Int_Sources;
+           & Timer1_Sources & Timer2_Sources & Ext_Int_Sources
+           & WDT_Sources;
       --  no ADC on atmega162
 
       when "atmega169" =>

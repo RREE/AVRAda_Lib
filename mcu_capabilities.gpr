@@ -30,7 +30,7 @@ abstract project MCU_Capabilities is
    case MCU is
    when "atmega168"  | "atmega328p" | "atmega644"  | "atmega644p"
       | "atmega2560" | "attiny2313" | "attiny4313" | "at90usb1286"
-      | "atmega32u4" | "attiny85"
+      | "atmega32u4" | "attiny85" | "atmega1280"
      => Eeprom_WE := "eeprom_pe";
    when others
      => Eeprom_WE := "eeprom_we";

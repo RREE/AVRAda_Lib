@@ -30,7 +30,7 @@ package body AVR.Sleep is
 
 
    SM0 : Boolean renames
-#if MCU = "atmega8" or else MCU = "atmega32" or else MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "attiny85" then
+#if MCU = "atmega8" or else MCU = "atmega32" or else MCU = "atmega1280" or else MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "attiny85" then
       MCUCR_Bits (SM0_Bit);
 #elsif MCU = "atmega162" then
       EMCUCR_Bits (SM0_Bit);
