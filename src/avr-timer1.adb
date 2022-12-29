@@ -40,7 +40,7 @@ package body AVR.Timer1 is
 
 #if MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega2560" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega8u2" or else MCU = "at90usb1286" or else MCU = "atmega32u4" then
    Interrupt_Mask : Bits_In_Byte renames MCU.TIMSK1_Bits;
-#elsif MCU = "atmega8" or else MCU = "atmega32" or else MCU = "attiny4313" or else MCU = "attiny2313" then
+#elsif MCU = "atmega8" or else MCU = "atmega32" or else MCU = "atmega162" or else MCU = "attiny4313" or else MCU = "attiny2313" then
    Interrupt_Mask : Bits_In_Byte renames MCU.TIMSK_Bits;
 #end if;
    Output_Compare_Interrupt_Enable : Boolean renames Interrupt_Mask (MCU.OCIE1A_Bit);
