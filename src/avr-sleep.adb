@@ -35,7 +35,7 @@ package body AVR.Sleep is
 #elsif MCU = "atmega162" then
       EMCUCR_Bits (SM0_Bit);
 #else
-      SMCR_Bits (SMO_Bit);
+      SMCR_Bits (SM0_Bit);
 #end if;
 
 
