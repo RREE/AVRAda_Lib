@@ -14,7 +14,7 @@ microcontrollers. Some of them only have a few bytes of RAM.  You then
 think twice if you want your string variables indexed by a 8bit wide
 or 16bit wide index.
 
-The library make heavy use of the GNAT preprocessor. All compilations
-have the symbol of the respective MCU name and the UART/Serial
+The library makes heavy use of the GNAT preprocessor. All compilations
+have the symbol of the respective MCU name defined. The UART/Serial
 interface distinguishes between UART, USART, USART0, and USART1 for
-example. See the file mcu_capabilities.gpr.
+example. See the file `mcu_capabilities.gpr`.
