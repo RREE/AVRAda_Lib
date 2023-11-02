@@ -1,12 +1,12 @@
 name = "avrada_lib"
 description = "Library of drivers for AVR microcontrollers"
-version = "2.1.0"
+version = "2.1.1"
 
 authors = ["Rolf Ebert"]
 maintainers = ["Rolf Ebert <rolf.ebert.gcc@gmx.de>"]
 maintainers-logins = ["RREE"]
 licenses = "GPL-2.0-or-later WITH GCC-exception-3.1"
-website = "https://sourceforge.net/projects/avr-ada/"
+website = "https://github.com/RREE/AVRAda_Doc/"
 tags = ["avr", "embedded", "drivers"]
 
 [configuration.variables]
@@ -21,7 +21,7 @@ Process_Timing_Events_In_Ticks = {type = "Boolean", default = false}
 UART_Receive_Mode = {type = "Enum", values = ["polled", "interrupt"], default = "polled"}
 
 [[depends-on]]
-gnat_avr_elf = "^11 | ^12.2"
-avrada_rts = "^2.0.1"
-avrada_mcu = "^2.1"
+gnat_avr_elf = "^11 | ^12.2 | ^13.2"
+avrada_rts = "^2.0.2"
+avrada_mcu = "^2.2.1"
 
