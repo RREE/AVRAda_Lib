@@ -47,15 +47,15 @@ package AVR.Timer1 is
    Fast_PWM_8bit              : constant PWM_Type; --  top = 00FF
    Fast_PWM_9bit              : constant PWM_Type; --  top = 01FF
    Fast_PWM_10bit             : constant PWM_Type; --  top = 03FF
-   --  Fast_PWM_ICR               : constant PWM_Type; --  top = MCU.ICR1
-   --  Fast_PWM_OCR               : constant PWM_Type; --  top = MCU.OCR1A
+   Fast_PWM_ICR               : constant PWM_Type; --  top = MCU.ICR1
+   Fast_PWM_OCR               : constant PWM_Type; --  top = MCU.OCR1A
    Phase_Correct_PWM_8Bit     : constant PWM_Type; --  top = 00FF
-   --  Phase_Correct_PWM_9Bit     : constant PWM_Type; --  top = 01FF
-   --  Phase_Correct_PWM_10Bit    : constant PWM_Type; --  top = 03FF
-   --  Phase_Correct_PWM_ICR      : constant PWM_Type; --  top = MCU.ICR1
-   --  Phase_Correct_PWM_OCR      : constant PWM_Type; --  top = MCU.OCR1A
-   --  Phase_Freq_Correct_PWM_ICR : constant PWM_Type; --  top = MCU.ICR1
-   --  Phase_Freq_Correct_PWM_OCR : constant PWM_Type; --  top = MCU.OCR1A
+   Phase_Correct_PWM_9Bit     : constant PWM_Type; --  top = 01FF
+   Phase_Correct_PWM_10Bit    : constant PWM_Type; --  top = 03FF
+   Phase_Correct_PWM_ICR      : constant PWM_Type; --  top = MCU.ICR1
+   Phase_Correct_PWM_OCR      : constant PWM_Type; --  top = MCU.OCR1A
+   Phase_Freq_Correct_PWM_ICR : constant PWM_Type; --  top = MCU.ICR1
+   Phase_Freq_Correct_PWM_OCR : constant PWM_Type; --  top = MCU.OCR1A
 
 
    --  normal mode
@@ -76,7 +76,15 @@ package AVR.Timer1 is
    procedure Set_Output_Compare_Mode_B_Toggle;
    procedure Set_Output_Compare_Mode_B_Clear;
    procedure Set_Output_Compare_Mode_B_Set;
-
+   --  renames for PWM mode
+   procedure Set_Output_Compare_Mode_Non_Inverted
+     renames Set_Output_Compare_Mode_Clear;
+   procedure Set_Output_Compare_Mode_Inverted
+     renames Set_Output_Compare_Mode_Set;
+   procedure Set_Output_Compare_Mode_B_Non_Inverted
+     renames Set_Output_Compare_Mode_B_Clear;
+   procedure Set_Output_Compare_Mode_B_Inverted
+     renames Set_Output_Compare_Mode_B_Set;
    --  stop the timer,
    --  set prescaler to No_Clock_Source, disable timer interrupts
    procedure Stop;
@@ -94,18 +102,18 @@ private
    type PWM_Type is array (0..3) of Boolean;
    -- pragma Pack (PWM_Type);
    -- for PWM_Type'Size use 8;
-   Fast_PWM_8bit              : constant PWM_Type := (0 => True,  1 => False, 2 => True,  3 => False); --  top = 00FF
-   Fast_PWM_9bit              : constant PWM_Type := (0 => False, 1 => True,  2 => True,  3 => False); --  top = 01FF
-   Fast_PWM_10bit             : constant PWM_Type := (0 => True,  1 => True,  2 => True,  3 => False); --  top = 03FF
-   --  Fast_PWM_ICR               : constant PWM_Type := 14; --  TOP = MCU.ICR1
-   --  Fast_PWM_OCR               : constant PWM_Type := 15; --  TOP = MCU.OCR1A
-   Phase_Correct_PWM_8Bit     : constant PWM_Type := (0 => True,  1 => False, 2 => False, 3 => False); --  top = 00FF
-   --  Phase_Correct_PWM_9Bit     : constant PWM_Type :=  2; --  TOP = 01FF
-   --  Phase_Correct_PWM_10Bit    : constant PWM_Type :=  3; --  TOP = 03FF
-   --  Phase_Correct_PWM_ICR      : constant PWM_Type := 10; --  TOP = MCU.ICR1
-   --  Phase_Correct_PWM_OCR      : constant PWM_Type := 11; --  TOP = MCU.OCR1A
-   --  Phase_Freq_Correct_PWM_ICR : constant PWM_Type :=  8; --  TOP = MCU.ICR1
-   --  Phase_Freq_Correct_PWM_OCR : constant PWM_Type :=  9; --  TOP = MCU.OCR1A
+   Fast_PWM_8bit              : constant PWM_Type := (0 => True,  1 => False, 2 => True,  3 => False); --  mode 5,  TOP = 00FF
+   Fast_PWM_9bit              : constant PWM_Type := (0 => False, 1 => True,  2 => True,  3 => False); --  mode 6,  TOP = 01FF
+   Fast_PWM_10bit             : constant PWM_Type := (0 => True,  1 => True,  2 => True,  3 => False); --  mode 7,  TOP = 03FF
+   Fast_PWM_ICR               : constant PWM_Type := (0 => False, 1 => True,  2 => True,  3 => True);  --  mode 14, TOP = MCU.ICR1
+   Fast_PWM_OCR               : constant PWM_Type := (0 => True,  1 => True,  2 => True,  3 => True);  --  mode 15, TOP = MCU.OCR1A
+   Phase_Correct_PWM_8Bit     : constant PWM_Type := (0 => True,  1 => False, 2 => False, 3 => False); --  mode 1,  TOP = 00FF
+   Phase_Correct_PWM_9Bit     : constant PWM_Type := (0 => False, 1 => True,  2 => False, 3 => False); --  mode 2,  TOP = 01FF
+   Phase_Correct_PWM_10Bit    : constant PWM_Type := (0 => True,  1 => True,  2 => False, 3 => False); --  mode 3,  TOP = 03FF
+   Phase_Correct_PWM_ICR      : constant PWM_Type := (0 => False, 1 => True,  2 => False, 3 => True);  --  mode 10, TOP = MCU.ICR1
+   Phase_Correct_PWM_OCR      : constant PWM_Type := (0 => True,  1 => True,  2 => False, 3 => True);  --  mode 11, TOP = MCU.OCR1A
+   Phase_Freq_Correct_PWM_ICR : constant PWM_Type := (0 => False, 1 => False, 2 => False, 3 => True);  --  mode 8,  TOP = MCU.ICR1
+   Phase_Freq_Correct_PWM_OCR : constant PWM_Type := (0 => True,  1 => False, 2 => False, 3 => True);  --  mode 9,  TOP = MCU.OCR1A
 
 
    pragma Inline (No_Clock_Source);
